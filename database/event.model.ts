@@ -131,8 +131,10 @@ EventSchema.pre('save', function (next) {
 EventSchema.index({ slug: 1 }, { unique: true });
 
 /**
- * Generates a URL-friendly slug from a title
- * Converts to lowercase, replaces spaces with hyphens, removes special characters
+ * Create a URL-friendly slug from a title.
+ *
+ * @param title - Source text to convert into a slug
+ * @returns A lowercase slug derived from `title` with special characters removed, spaces replaced by hyphens, and no leading or trailing hyphens
  */
 function generateSlug(title: string): string {
   return title
@@ -145,8 +147,11 @@ function generateSlug(title: string): string {
 }
 
 /**
- * Normalizes date string to ISO 8601 format (YYYY-MM-DD)
- * Accepts various date formats and converts them to standard format
+ * Convert an input date string to an ISO 8601 date in YYYY-MM-DD format.
+ *
+ * @param dateStr - The input date string to normalize
+ * @returns The normalized date as `YYYY-MM-DD`
+ * @throws Error if `dateStr` cannot be parsed as a valid date
  */
 function normalizeDate(dateStr: string): string {
   const date = new Date(dateStr);
@@ -160,8 +165,11 @@ function normalizeDate(dateStr: string): string {
 }
 
 /**
- * Normalizes time to HH:MM format (24-hour)
- * Ensures consistent time storage
+ * Normalize a time string into 24-hour `HH:MM` format.
+ *
+ * @param timeStr - Time in common formats such as `HH:MM`, `H:MM`, or `HH:MM AM/PM`
+ * @returns The time formatted as `HH:MM` in 24-hour notation
+ * @throws Error if the input does not match expected time formats or if hours/minutes are out of range
  */
 function normalizeTime(timeStr: string): string {
   // Match common time formats: HH:MM, H:MM, HH:MM AM/PM, etc.
