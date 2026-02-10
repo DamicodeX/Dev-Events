@@ -2,6 +2,7 @@ import { Schema, model, models, Document } from 'mongoose';
 
 // TypeScript interface for Event document
 export interface IEvent extends Document {
+  id: null | undefined;
   title: string;
   slug: string;
   description: string;
@@ -108,27 +109,22 @@ const EventSchema = new Schema<IEvent>(
 );
 
 // Pre-save hook for slug generation and data normalization
-EventSchema.pre('save', function (next) {
-  // Generate slug only if title is modified or document is new
+EventSchema.pre('save', async function () {
   if (this.isModified('title')) {
     this.slug = generateSlug(this.title);
   }
 
-  // Normalize and validate date to ISO format
   if (this.isModified('date')) {
     this.date = normalizeDate(this.date);
   }
 
-  // Normalize time format (HH:MM)
   if (this.isModified('time')) {
     this.time = normalizeTime(this.time);
   }
-
-  next();
-});
+})
 
 // Create unique index on slug for faster lookups and uniqueness
-EventSchema.index({ slug: 1 }, { unique: true });
+// EventSchema.index({ slug: 1 }, { unique: true });
 
 /**
  * Generates a URL-friendly slug from a title

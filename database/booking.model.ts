@@ -14,7 +14,7 @@ const BookingSchema = new Schema<IBooking>(
       type: Schema.Types.ObjectId,
       ref: 'Event',
       required: [true, 'Event ID is required'],
-      index: true, // Index for faster queries by eventId
+      // index: true, 
     },
     email: {
       type: String,
@@ -37,28 +37,17 @@ const BookingSchema = new Schema<IBooking>(
 );
 
 // Pre-save hook to validate that the referenced event exists
-BookingSchema.pre('save', async function (next) {
-  // Only validate eventId if it's new or modified
+BookingSchema.pre('save', async function () {
   if (this.isNew || this.isModified('eventId')) {
-    try {
-      // Import Event model dynamically to avoid circular dependency issues
-      const Event = models.Event || (await import('./event.model')).default;
-      
-      // Check if the event exists in the database
-      const eventExists = await Event.exists({ _id: this.eventId });
+    const Event = models.Event || (await import('./event.model')).default;
+    
+    const eventExists = await Event.exists({ _id: this.eventId });
 
-      if (!eventExists) {
-        throw new Error(`Event with ID ${this.eventId} does not exist`);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        return next(error);
-      }
-      return next(new Error('Failed to validate event reference'));
+    if (!eventExists) {
+      throw new Error(`Event with ID ${this.eventId} does not exist`);
     }
   }
-
-  next();
+  // No next() call needed
 });
 
 // Create index on eventId for efficient queries
