@@ -25,7 +25,7 @@ import { cacheLife } from "next/cache";
 //     time: "Time-2",
 //   }
 // ]
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://dev-events-p25z.vercel.app';;
 const Home = async() => {
   "use cache"
   cacheLife('hours');

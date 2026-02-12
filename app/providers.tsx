@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
-
+import { Suspense } from "react"
 import posthog from 'posthog-js'
 import { PostHogProvider as PHProvider } from 'posthog-js/react'
 
@@ -15,8 +15,13 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <PHProvider client={posthog}>
-      {children}
-    </PHProvider>
+    <>
+      <Suspense fallback={<div>Loading...</div>}>
+        <PHProvider client={posthog}>
+          {children}
+        </PHProvider>
+      </Suspense>
+    </>
+
   )
 }
