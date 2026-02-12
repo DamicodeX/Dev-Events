@@ -1,37 +1,33 @@
-import Image from "next/image";
-import ExploreBtn from "@/components/ExploreBtn";
+'use client'
+
+import { useEffect, useState } from 'react';
 import EventCard from "@/components/EventCard";
+import ExploreBtn from "@/components/ExploreBtn";
 import { IEvent } from "@/database";
-import { cacheLife } from "next/cache";
-// import { events } from "@/lib/constants";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://dev-events-p25z.vercel.app';
 
-// const events = [
-//   {
-//     image: "/images/event1.png", 
-//     title:"Event 1",
-//     slug: "event-1",
-//     location: "location-1",
-//     date:"Date-1",
-//     time: "Time-1",
-  
-//   },
-//   {
-//     image: "/images/event2.png",
-//     title: "Event 2",
-//     slug: "event-2",
-//     location: "location-2",
-//     date: "Date-2",
-//     time: "Time-2",
-//   }
-// ]
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://dev-events-p25z.vercel.app';;
-const Home = async() => {
-  "use cache"
-  cacheLife('hours');
-  const response = await fetch(`${BASE_URL}/api/events`);
+const Home = () => {
+  const [events, setEvents] = useState<IEvent[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { events} = await response.json();
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/events`);
+        if (response.ok) {
+          const data = await response.json();
+          setEvents(data.events || []);
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   return (
     <section>
@@ -42,17 +38,24 @@ const Home = async() => {
       <div className="mt-20 space-y-7">
         <h3>Featured Events</h3>
 
-        <ul className="events">
-          {events && events.length > 0 && events.map((event: IEvent)=> (
-            <li key={event.title} className="list-none">
-              <EventCard {...event}/>
-            </li>
-          ))}
-        </ul>
+        {loading ? (
+          <p>Loading events...</p>
+        ) : (
+          <ul className="events">
+            {events && events.length > 0 ? (
+              events.map((event: IEvent) => (
+                <li key={event.title || event.slug} className="list-none">
+                  <EventCard {...event}/>
+                </li>
+              ))
+            ) : (
+              <p>No events available at the moment.</p>
+            )}
+          </ul>
+        )}
       </div>
     </section>
-
   );
 }
 
-export default Home
+export default Home;
